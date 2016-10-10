@@ -1,11 +1,13 @@
 package com.xiaofei.rxjavax;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -48,13 +50,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+
+
         mToolbar.setTitle(R.string.app_title);
         setSupportActionBar(mToolbar);
 
         mAppsView.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new AppAdapter(new ArrayList<>(), R.layout.item_app_list);
-        mAppsView.setAdapter(mAdapter);
+        mAdapter.setOnItemClickListener(this::launchApp);
 
+        mAppsView.setAdapter(mAdapter);
+        mAppsView.setItemAnimator(new DefaultItemAnimator());
         mAppContainer.setColorSchemeResources(
                 android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -108,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 Utils.storeBitmap(App.instance, icon, name);
 
                 if (subscriber != null) {
-                    subscriber.onNext(new AppInfo(appInfoRich.getLastInstallTime(), name, iconPath));
+                    subscriber.onNext(new AppInfo(appInfoRich.getLastInstallTime(), name, iconPath, appInfoRich.getResolveInfo()));
                 }
             });
 
@@ -116,6 +122,19 @@ public class MainActivity extends AppCompatActivity {
                 subscriber.onCompleted();
             }
         });
+    }
+
+    private void launchApp(View view, AppInfo appInfo) {
+        ResolveInfo resolveInfo = appInfo.getResolveInfo();
+        if (null != resolveInfo) {
+            String packageName = resolveInfo.activityInfo.packageName;
+            String className = resolveInfo.activityInfo.name;
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.setComponent(new ComponentName(packageName, className));
+            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+            startActivity(intent);
+        }
     }
 
     @DebugLog

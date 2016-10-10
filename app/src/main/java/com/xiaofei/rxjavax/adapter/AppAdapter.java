@@ -13,11 +13,10 @@ import com.xiaofei.rxjavax.R;
 import com.xiaofei.rxjavax.model.AppInfo;
 
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 
+import hugo.weaving.DebugLog;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -31,6 +30,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
 
     private List<AppInfo> apps;
     private int rowLayout;
+    private OnItemClickListener mOnItemClickListener;
 
     public AppAdapter(List<AppInfo> apps, int rowLayout) {
         this.apps = apps;
@@ -51,12 +51,17 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         notifyItemInserted(position);
     }
 
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_app_list, parent, false);
         return new ViewHolder(view);
     }
 
+    @DebugLog
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final AppInfo appInfo = apps.get(position);
@@ -65,13 +70,11 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(holder.mImageView::setImageBitmap);
-                /*
-                .subscribe(new Action1<Bitmap>() {
-                    @Override
-                    public void call(Bitmap bitmap) {
-                        holder.mImageView.setImageBitmap(bitmap);
-                    }
-                });*/
+
+        //set onclick listener
+        if (mOnItemClickListener != null) {
+            holder.itemView.setOnClickListener(view -> mOnItemClickListener.onItemClick(holder.itemView, appInfo));
+        }
     }
 
     @Override
@@ -98,5 +101,9 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
             mTextView = (TextView) itemView.findViewById(R.id.name);
             mImageView = (ImageView) itemView.findViewById(R.id.image);
         }
+    }
+
+    public interface OnItemClickListener{
+        void onItemClick(View view, AppInfo appInfo);
     }
 }

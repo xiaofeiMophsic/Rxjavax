@@ -1,6 +1,9 @@
 package com.xiaofei.rxjavax.model;
 
 
+import android.content.pm.ResolveInfo;
+import android.support.annotation.NonNull;
+
 /**
  * 作者：xiaofei
  * 日期：2016/10/9
@@ -12,13 +15,22 @@ public class AppInfo implements Comparable<AppInfo> {
     private long mLastUpdateTime;
     private String mName;
     private String mIcon;
+    private ResolveInfo mResolveInfo;
 
-    public AppInfo(long lastUpdateTime, String name, String icon) {
+    public AppInfo(long lastUpdateTime, String name, String icon, ResolveInfo resolveInfo) {
         mLastUpdateTime = lastUpdateTime;
         mName = name;
         mIcon = icon;
+        mResolveInfo = resolveInfo;
     }
 
+    public ResolveInfo getResolveInfo() {
+        return mResolveInfo;
+    }
+
+    public void setResolveInfo(ResolveInfo resolveInfo) {
+        mResolveInfo = resolveInfo;
+    }
 
     public long getLastUpdateTime() {
         return mLastUpdateTime;
@@ -45,7 +57,7 @@ public class AppInfo implements Comparable<AppInfo> {
     }
 
     @Override
-    public int compareTo(AppInfo other) {
+    public int compareTo(@NonNull AppInfo other) {
         return getName().compareTo(other.getName());
     }
 
