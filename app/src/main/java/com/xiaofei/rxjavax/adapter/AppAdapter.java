@@ -89,6 +89,10 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         });
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(View view, AppInfo appInfo);
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView mTextView;
@@ -101,9 +105,5 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
             mTextView = (TextView) itemView.findViewById(R.id.name);
             mImageView = (ImageView) itemView.findViewById(R.id.image);
         }
-    }
-
-    public interface OnItemClickListener{
-        void onItemClick(View view, AppInfo appInfo);
     }
 }
