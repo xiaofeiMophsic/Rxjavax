@@ -1,6 +1,14 @@
 package com.xiaofei.rxjavax;
 
+import com.xiaofei.rxjavax.data.Network;
+import com.xiaofei.rxjavax.data.api.ZhuangbiApi;
+import com.xiaofei.rxjavax.model.ZhuangbiImage;
+
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import rx.Observable;
 
@@ -24,7 +32,9 @@ public class ExampleUnitTest {
         Observable<Integer> deferObservable = Observable.defer(this::getInt);
         deferObservable.subscribe(System.out::print);
         */
-
+        Observable.from(makeStrings())
+                .map(String::toLowerCase)
+                .subscribe(System.out::println);
     }
 
     private Observable<Integer> getInt() {
@@ -36,5 +46,23 @@ public class ExampleUnitTest {
             subscriber.onNext(100);
             subscriber.onCompleted();
         });
+    }
+
+    private List<String> makeStrings(){
+        List<String> strings = new ArrayList<>();
+        strings.add("Allo");
+        strings.add("Bob");
+        strings.add("Career");
+        strings.add("dog");
+        strings.add("Elva");
+        return Collections.unmodifiableList(strings);
+    }
+
+    @Test
+    public void testZhuangbiApi(){
+        ZhuangbiApi api = Network.getInstance().getZhuangbiAPI();
+        Observable<List<ZhuangbiImage>> observable = api.getZhuangbiImage("装逼");
+        observable.take(10)
+                .subscribe(System.out::println);
     }
 }
